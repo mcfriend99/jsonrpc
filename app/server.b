@@ -25,7 +25,7 @@ def request_processor(req, res, klass) {
   res.headers['Content-Type'] = 'application/json'
 
   try {
-    var request = JsonRPCRequest.fromString(req.body)
+    var request = JsonRPCRequest.fromString(req.body.to_string())
 
     var result, error
 
@@ -90,6 +90,7 @@ def request_processor(req, res, klass) {
     var id = nil
     if instance_of(e, JsonException) and e.id != nil
       id = e.id
+    else e = Error(e.message, e.stacktrace)
     res.write(json.encode(JsonRPCResponse(id, nil, e)))
   }
 }

@@ -1,5 +1,5 @@
 # The `json-rpc` server servers a class over RPC. Below, we create our test class.
-import ..lib as jsonrpc
+import ..app as jsonrpc
 
 class Account {
   var name = 'Cardi B.'

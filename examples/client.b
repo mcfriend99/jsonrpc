@@ -1,6 +1,6 @@
 # This example connects to the example server in `examples/server.b` and does a many RPC calls
 
-import ..lib as jsonrpc
+import ..app as jsonrpc
 
 var app = jsonrpc.open('localhost:8900')
 

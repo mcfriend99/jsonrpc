@@ -21,4 +21,4 @@ echo solana.call('getBalance', '83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri')
 
 You should see an output looking like this: `{context: {slot: 128847428}, value: 0}` if you are connected to the internet.
 
-See the `examples` directory for more examples and documentation.
+See the `examples` directory for more examples and documentation on how to use.

@@ -1,0 +1,17 @@
+{
+  "name": "jsonrpc", 
+  "version": "1.0.0", 
+  "description": "JSON-RPC 2.0 library for Blade programming language", 
+  "homepage": "https://github.com/mcfriend99/jsonrpc", 
+  "tags": [
+    "json", 
+    "rpc", 
+    "jsonrpc"
+  ], 
+  "author": "Richard Ore <eqliqandfriends@gmail.com>", 
+  "license": "MIT", 
+  "sources": [
+    "nyssa.bladelang.com"
+  ], 
+  "deps": {}
+}

@@ -33,8 +33,9 @@ class JsonRPCClient {
       if !request.is_notification {
         var data = JsonRPCResponse.fromString(response.body.to_string())
         if data.error {
-          data.error.message = '${method}(): ${data.error.message}'
-          die JsonRPCException(data.error)
+          var err = data.error
+          err.message = '${method}(): ${data.error.message}'
+          die JsonRPCException(err)
         }
         else return data.result
       }

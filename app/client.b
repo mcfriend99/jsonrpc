@@ -28,10 +28,10 @@ class JsonRPCClient {
   _call(id, method, params) {
     var request = JsonRPCRequest(id, method, params)
     var response = self.client.send_request(self.endpoint, 'POST', json.encode(request))
+    var data = JsonRPCResponse.fromString(response.body.to_string())
             
     if response.status == http.OK {
       if !request.is_notification {
-        var data = JsonRPCResponse.fromString(response.body.to_string())
         if data.error {
           var err = data.error
           err.message = '${method}(): ${data.error.message}'
@@ -43,7 +43,7 @@ class JsonRPCClient {
     } else if response.status == http.NO_CONTENT and request.is_notification {
       # Do nothing. It is a notification response
     } else {
-      die Exception(response.error)
+      die data.error
     }
   }
 

@@ -4,7 +4,7 @@ import http
 import .request { JsonRPCRequest }
 import .response { JsonRPCResponse }
 import .error { * }
-import .call
+import ..call
 
 def call_method(id, method, params) {
   try {

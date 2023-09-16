@@ -62,6 +62,15 @@ class JsonRPCClient {
     return self._call(self.last_id, method, self._clean_args(__args__))
   }
 
+  call_list(method, list) {
+    if !is_string(method)
+      die Exception('method must be string')
+
+    # Increment ID so we can reconcile when feedback come.
+    self.last_id++
+    return self._call(self.last_id, method, list)
+  }
+
   notify(method, ...) {
     if !is_string(method)
       die Exception('method must be string')

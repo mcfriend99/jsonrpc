@@ -1,4 +1,4 @@
-import .app.error
+import .error
 
 def call_method(method, p) {
   if is_dict(p) return method(p)

@@ -7,7 +7,7 @@ import .error { * }
 import .call
 
 def call_method(id, method, params) {
-  try {
+  catch {
     var result
     if params == nil {
       result = method()
@@ -16,7 +16,9 @@ def call_method(id, method, params) {
     }
 
     return JsonRPCResponse(id, result, nil)
-  } catch Exception e {
+  } as e 
+  
+  if e {
     return JsonRPCResponse(id, nil, Error(e.message, e.stacktrace))
   }
 }
@@ -24,18 +26,18 @@ def call_method(id, method, params) {
 def request_processor(req, res, klass) {
   res.headers['Content-Type'] = 'application/json'
 
-  try {
-    var request = JsonRPCRequest.fromString(req.body.to_string())
+  catch {
+    var request = JsonRPCRequest.fromJson(req.body)
 
     var result, error
 
     # ensure we are dealing with a real class
     if !is_instance(klass)
-      die ServerError(request.id)
+      raise ServerError(request.id)
 
     if is_list(request) {
       if request.is_empty()
-        die InvalidRequest()
+        raise InvalidRequest()
 
       result = []
 
@@ -66,7 +68,7 @@ def request_processor(req, res, klass) {
     } else {
       if !reflect.has_method(klass, request.method) {
         if !request.is_notification {
-          die MethodNotFound(request.id)
+          raise MethodNotFound(request.id)
         } else {
           result = ''
           res.status = http.NO_CONTENT
@@ -84,9 +86,12 @@ def request_processor(req, res, klass) {
       }
     }
 
-    if result
+    if result {
       res.write(json.encode(result))
-  } catch Exception e {
+    }
+  } as e 
+  
+  if e {
     var id = nil
     if instance_of(e, JsonException) and e.id != nil
       id = e.id
@@ -97,9 +102,12 @@ def request_processor(req, res, klass) {
 
 def serve(port, klass) {
   var server = http.server(port)
-  server.on_receive(|req, res| {
-    if !req.headers.contains('Content-Type') or
-      req.headers['Content-Type'] != 'application/json' {
+  server.on_receive(@(req, res) {
+    var headers = {}
+    req.headers.each(@(v, k){ headers[k.lower()] = v })
+
+    if !headers.contains('content-type') or
+      headers['content-type'] != 'application/json' {
         res.status = http.UNSUPPORTED_MEDIA_TYPE
         res.write('415 Unsupported Media Type')
     } else if req.method.upper() != 'POST' {
@@ -109,8 +117,10 @@ def serve(port, klass) {
       request_processor(req, res, klass)
     }
   })
-  server.on_error(|e, c| {
+
+  server.on_error(@(e, c) {
     echo 'Error occured: ${e.message}\n${e.stacktrace}'
   })
+
   server.listen()
 }

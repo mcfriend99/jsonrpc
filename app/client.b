@@ -27,15 +27,20 @@ class JsonRPCClient {
 
   _call(id, method, params) {
     var request = JsonRPCRequest(id, method, params)
-    var response = self.client.send_request(self.endpoint, 'POST', json.encode(request))
+    var response = self.client.post(self.endpoint, json.encode(request))
+    if response.status == http.NO_CONTENT {
+      # server only sent a notification
+      return
+    }
+
     var data = JsonRPCResponse.fromString(response.body.to_string())
-            
+    
     if response.status == http.OK {
       if !request.is_notification {
         if data.error {
           var err = data.error
           err.message = '${method}(): ${data.error.message}'
-          die JsonRPCException(err)
+          raise JsonRPCException(err)
         }
         else return data.result
       }
@@ -43,7 +48,7 @@ class JsonRPCClient {
     } else if response.status == http.NO_CONTENT and request.is_notification {
       # Do nothing. It is a notification response
     } else {
-      die data.error
+      raise data.error
     }
   }
 
@@ -55,7 +60,7 @@ class JsonRPCClient {
 
   call(method, ...) {
     if !is_string(method)
-      die Exception('method must be string')
+      raise Exception('method must be string')
 
     # Increment ID so we can reconcile when feedback come.
     self.last_id++
@@ -64,7 +69,7 @@ class JsonRPCClient {
 
   call_list(method, list) {
     if !is_string(method)
-      die Exception('method must be string')
+      raise Exception('method must be string')
 
     # Increment ID so we can reconcile when feedback come.
     self.last_id++
@@ -73,7 +78,7 @@ class JsonRPCClient {
 
   notify(method, ...) {
     if !is_string(method)
-      die Exception('method must be string')
+      raise Exception('method must be string')
     
     return self._call(nil, method, self._clean_args(__args__))
   }

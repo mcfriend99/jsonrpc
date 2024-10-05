@@ -5,7 +5,7 @@ class JsonRPCError {
 
   JsonRPCError(exception) {
     if !instance_of(exception, JsonException)
-      die Exception('instance of JsonException expected')
+      raise Exception('instance of JsonException expected')
     
     self.code = exception.code
     self.message = exception.message

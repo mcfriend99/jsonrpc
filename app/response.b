@@ -9,7 +9,7 @@ class JsonRPCResponse {
   JsonRPCResponse(id, result, error) {
 
     if error != nil and !instance_of(error, JsonException)
-      die Exception('instance of JsonException expected as response error')
+      raise Exception('instance of JsonException expected as response error')
 
     self.id = id
     self.result = result
@@ -45,21 +45,21 @@ class JsonRPCResponse {
 
   static fromDict(dict) {
     if !is_dict(dict)
-      die Exception('dictionary expected')
+      raise Exception('dictionary expected')
 
     if !dict.contains('jsonrpc') or dict.jsonrpc != '2.0'
-      die Exception('Server is not an RPC server')
+      raise Exception('Server is not an RPC server')
 
     if !dict.contains('id')
-      die Exception('response id required')
+      raise Exception('response id required')
 
     if !dict.contains('result') and !dict.contains('error')
-      die Exception('response requires "result" when no error occurs')
+      raise Exception('response requires "result" when no error occurs')
     if !dict.contains('error') and !dict.contains('result')
-      die Exception('response requires "error" when call fails')
+      raise Exception('response requires "error" when call fails')
 
     if dict.contains('error') and !instance_of(dict.error, JsonException)
-      die Exception('instance of JsonException expected as response error')
+      raise Exception('instance of JsonException expected as response error')
 
     var result = dict.get('result', nil)
     var error = dict.get('error', nil)
@@ -68,7 +68,7 @@ class JsonRPCResponse {
 
   static fromString(str) {
     if !is_string(str)
-      die Exception('string expected')
+      raise Exception('string expected')
 
     var d = json.decode(str)
     

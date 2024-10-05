@@ -6,7 +6,7 @@ def _verify_id(id) {
   #   or NULL value if included.
   # - Numbers SHOULD NOT contain fractional parts.
   if !is_string(id) and !(is_number(id) and is_int(id)) and id != nil
-    die error.InvalidRequest()
+    raise error.InvalidRequest()
 }
 
 def _verify_params(params) {
@@ -19,7 +19,7 @@ def _verify_params(params) {
   #     result in an error being generated. The names MUST match exactly, 
   #     including case, to the method's expected parameters.
   if params != nil and !is_dict(params) and !is_list(params)
-    die error.InvalidRequest()
+    raise error.InvalidRequest()
 }
 
 def _process_request(d) {
@@ -54,7 +54,7 @@ class JsonRPCRequest {
     _verify_id(id)
 
     if !is_string(method)
-      die error.InvalidRequest()
+      raise error.InvalidRequest()
 
     _verify_params(params)
 
@@ -77,21 +77,14 @@ class JsonRPCRequest {
     return d
   }
 
-  static fromString(str) {
-    if !is_string(str)
-      die Exception('string expected')
+  static fromJson(data) {
+    if !is_list(data) and !is_dict(data)
+      raise Exception('list or dictionary expected')
 
-    var d
-    try {
-      d = json.decode(str)
-    } catch Exception e {
-      die error.InvalidJson()
-    }
-
-    if is_list(d) {
+    if is_list(data) {
       var r = []
 
-      for x in d {
+      for x in data {
         if !is_dict(x) {
           r.append(error.InvalidRequest())
         } else {
@@ -105,16 +98,16 @@ class JsonRPCRequest {
       }
 
       if r.is_empty()
-        die error.InvalidRequest()
+        raise error.InvalidRequest()
 
       return r
     } else {
-      if !is_dict(d)
-        die error.InvalidRequest()
+      if !is_dict(data)
+        raise error.InvalidRequest()
 
-      var rep = _process_request(d)
+      var rep = _process_request(data)
       if !rep
-        die error.InvalidRequest()
+        raise error.InvalidRequest()
 
       return rep
     }
